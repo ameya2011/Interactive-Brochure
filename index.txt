@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andaman & Nicobar - Aesthetic Travel Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --ocean-teal: #0d9488;
+            --sandy-beige: #fdf6e3;
+            --tropical-green: #166534;
+            --pastel-blue: #e0f2fe;
+            --picsart-pink: #fbcfe8;
+        }
+
+        body {
+            background-color: #f0f4f4;
+            font-family: 'Montserrat', sans-serif;
+            color: #1a202c;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        .handwritten { font-family: 'Dancing Script', cursive; }
+
+        .brochure-wrapper {
+            perspective: 3000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brochure-container {
+            width: 1050px;
+            height: 650px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brochure-side {
+            backface-visibility: hidden;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .back-side { transform: rotateY(180deg); }
+        .is-flipped { transform: rotateY(180deg); }
+
+        .panel {
+            flex: 1;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.03);
+        }
+        
+        .fold-line {
+            width: 12px;
+            background: linear-gradient(to right, rgba(0,0,0,0.08) 0%, rgba(255,255,255,0.4) 50%, rgba(0,0,0,0.08) 100%);
+            height: 100%;
+            z-index: 50;
+        }
+
+        .brush-stroke {
+            position: absolute;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .sticker {
+            position: absolute;
+            z-index: 20;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+            pointer-events: none;
+        }
+
+        .halftone {
+            background-image: radial-gradient(#0d9488 1px, transparent 1px);
+            background-size: 6px 6px;
+            opacity: 0.15;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .postcard {
+            background: white;
+            padding: 8px;
+            padding-bottom: 24px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+        .postcard:hover { transform: scale(1.05) rotate(2deg); z-index: 40; }
+        .postcard img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+        .postcard-caption {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 8px;
+            color: #444;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .immersive-mode .brochure-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.96);
+            padding: 2rem;
+        }
+
+        .immersive-mode .brochure-container {
+            transform: scale(1.1) rotateY(var(--flip-angle, 0deg));
+        }
+        
+        #exit-immersive {
+            display: none;
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 10000;
+        }
+        .immersive-mode #exit-immersive { display: block; }
+
+        /* Panel Specific Backgrounds */
+        .bg-scuba {
+            background-image: linear-gradient(rgba(13, 148, 136, 0.85), rgba(13, 148, 136, 0.85)), url('https://images.unsplash.com/photo-1544551763-47a18411c976?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+        }
+        .bg-food {
+            background-image: linear-gradient(rgba(253, 246, 227, 0.9), rgba(253, 246, 227, 0.9)), url('https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+
+    <div id="controls" class="mb-10 text-center">
+        <div class="mb-2">
+            <span class="inline-block px-4 py-1 bg-teal-100 text-teal-800 text-[11px] font-bold uppercase tracking-[0.2em] rounded-full mb-3 shadow-sm">Travel Design Portfolio</span>
+            <h2 class="text-5xl font-bold text-teal-900 leading-tight">Andaman & Nicobar</h2>
+        </div>
+        <p class="text-gray-500 text-sm uppercase tracking-widest italic mb-6">Interactive 6-Panel Design • Tap to flip</p>
+        
+        <div class="flex gap-4 justify-center">
+            <button onclick="toggleFlip()" class="px-8 py-3 bg-teal-600 text-white text-xs font-bold rounded-full hover:bg-teal-700 transition-all shadow-lg uppercase tracking-widest flex items-center gap-2">🔄 Flip Brochure</button>
+            <button onclick="toggleImmersive()" class="px-8 py-3 bg-white text-teal-900 border border-teal-200 text-xs font-bold rounded-full hover:bg-teal-50 transition-all shadow-lg uppercase tracking-widest flex items-center gap-2">✨ Immersive View</button>
+        </div>
+    </div>
+
+    <button id="exit-immersive" onclick="toggleImmersive()" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-full backdrop-blur-md text-xs font-bold uppercase tracking-widest border border-white/20">✕ Close Immersive View</button>
+
+    <div id="wrapper" class="brochure-wrapper">
+        <div id="brochure" class="brochure-container cursor-pointer">
+            
+            <!-- SIDE A: EXTERIOR PANELS -->
+            <div class="brochure-side front-side bg-white">
+                
+                <!-- PANEL 5: RECREATION & TRAVEL INFO (With Scuba BG) -->
+                <div class="panel bg-scuba text-white">
+                    <div class="halftone"></div>
+                    <svg class="brush-stroke w-32 -top-4 -right-4 fill-white/20" viewBox="0 0 100 100"><path d="M0,50 Q25,0 50,50 T100,50" stroke="white" fill="none" stroke-width="20"/></svg>
+                    
+                    <h3 class="text-2xl font-bold mb-4 border-b border-white/30 pb-2 flex items-center gap-2">⛵ Recreation</h3>
+                    
+                    <div class="postcard -rotate-2 mb-4 bg-white p-2">
+                        <img src="https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&q=80&w=600" onerror="this.src='https://placehold.co/600x400/0d9488/fff?text=Scuba+Diving'" alt="Scuba">
+                        <div class="postcard-caption text-teal-900">Deep Sea Diving</div>
+                    </div>
+
+                    <div class="space-y-3 relative z-10">
+                        <div class="bg-black/20 p-3 rounded-lg backdrop-blur-sm border border-white/10">
+                            <h4 class="text-[11px] font-bold uppercase mb-1 text-teal-200">Activities</h4>
+                            <p class="text-[10px] leading-relaxed">Parasailing, Jet skiing, Trekking, Bird Watching, and world-class Snorkeling.</p>
+                        </div>
+                        <div class="bg-white/10 p-3 rounded-lg border border-white/10">
+                            <h4 class="text-[11px] font-bold uppercase mb-1 text-teal-200">Travel Info</h4>
+                            <p class="text-[9px]">Fly to <strong>Veer Savarkar Intl (IXZ)</strong>. Private ferries link Havelock & Neil islands.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto text-center border-t border-white/20 pt-4">
+                        <p class="handwritten text-xl text-teal-200">Happy Travels!</p>
+                    </div>
+                </div>
+
+                <div class="fold-line"></div>
+
+                <!-- PANEL 6: BACK COVER -->
+                <div class="panel bg-teal-950 text-white flex flex-col justify-center items-center text-center">
+                    <div class="halftone opacity-10"></div>
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6 relative">
+                        <span class="text-4xl relative z-10">🌴</span>
+                        <div class="absolute inset-0 border-2 border-dashed border-teal-500 rounded-full animate-spin-slow"></div>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-4">Why Visit?</h3>
+                    <ul class="text-left space-y-3 mb-8 relative z-10">
+                        <li class="flex items-center gap-2 text-[11px]"><span class="text-teal-400">✨</span> Crystal-clear Blue Beaches</li>
+                        <li class="flex items-center gap-2 text-[11px]"><span class="text-teal-400">✨</span> Rich Marine Biodiversity</li>
+                        <li class="flex items-center gap-2 text-[11px]"><span class="text-teal-400">✨</span> Historical Importance</li>
+                        <li class="flex items-center gap-2 text-[11px]"><span class="text-teal-400">✨</span> Peaceful Atmosphere</li>
+                    </ul>
+                    
+                    <div class="mt-auto">
+                        <p class="handwritten text-3xl text-teal-300 mb-2">A Tropical Escape...</p>
+                        <p class="uppercase tracking-[0.3em] text-[10px] font-bold opacity-60">You will never forget!</p>
+                        <div class="mt-6 p-2 bg-white inline-block rounded-md shadow-inner">
+                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=AndamanTourism" class="w-14 h-14 grayscale opacity-80" alt="QR">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fold-line"></div>
+
+                <!-- PANEL 1: FRONT COVER -->
+                <div class="panel p-0 overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=800" class="absolute inset-0 w-full h-full object-cover" alt="Cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-teal-950 via-teal-900/40 to-black/20"></div>
+                    
+                    <div class="relative z-10 h-full flex flex-col justify-between p-8 text-white">
+                        <div>
+                            <div class="w-16 h-1.5 bg-teal-400 mb-4 rounded-full"></div>
+                            <p class="uppercase tracking-[0.4em] text-[12px] font-bold text-teal-200">India's Hidden Gem</p>
+                            <h1 class="text-6xl font-bold leading-none mt-2">Discover<br>Paradise</h1>
+                        </div>
+
+                        <div class="postcard -rotate-6 w-52 self-end mb-16 border-none shadow-2xl">
+                            <img src="https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&q=80&w=400" alt="Scuba">
+                            <div class="postcard-caption text-black font-bold text-xs">Andaman & Nicobar</div>
+                            <!-- PicsArt Sparkle -->
+                            <span class="absolute -top-4 -right-4 text-3xl">✨</span>
+                        </div>
+
+                        <div class="mb-4 backdrop-blur-md bg-white/10 p-5 rounded-2xl border border-white/20">
+                            <p class="text-sm italic font-light leading-relaxed">"Where Emerald Waters Meet Untouched Beauty"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDE B: INTERIOR PANELS -->
+            <div class="brochure-side back-side bg-white">
+                
+                <!-- PANEL 2: GEOGRAPHY & CLIMATE -->
+                <div class="panel bg-[#e0f2fe]">
+                    <div class="halftone"></div>
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 class="text-4xl font-bold text-teal-950">Islands</h2>
+                        <span class="text-5xl sticker rotate-12">🗺️</span>
+                    </div>
+                    
+                    <div class="postcard rotate-1 mb-6">
+                        <img src="https://images.unsplash.com/photo-1542332213-31f87348057f?auto=format&fit=crop&q=80&w=600" alt="Forest">
+                        <div class="postcard-caption">Tropical Rainforests</div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-100 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-12 h-12 bg-blue-50 rounded-full"></div>
+                        <h4 class="text-xs font-bold text-blue-900 mb-2 uppercase tracking-widest">Climate</h4>
+                        <p class="text-[10px] text-gray-600 mb-2"><strong>Best Time:</strong> Oct to May</p>
+                        <p class="text-[10px] text-gray-600">Pleasant 23°C – 30°C avg temp.</p>
+                    </div>
+
+                    <div class="mt-auto pt-6 border-t border-blue-200 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-[11px] font-bold text-blue-900 uppercase">Capital</h4>
+                            <p class="text-[11px] text-blue-700">Port Blair</p>
+                        </div>
+                        <div class="text-right">
+                             <h4 class="text-[11px] font-bold text-blue-900 uppercase">Lingo</h4>
+                             <p class="text-[11px] text-blue-700">Hindi, English, Tamil</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fold-line"></div>
+
+                <!-- PANEL 3: 4-DAY ITINERARY -->
+                <div class="panel bg-[#fdf6e3]">
+                    <svg class="brush-stroke w-48 -bottom-10 -left-10 fill-teal-100" viewBox="0 0 100 100"><path d="M0,50 C20,30 40,70 60,50 S100,50 100,50" stroke="currentColor" fill="none" stroke-width="15"/></svg>
+                    <h2 class="text-3xl font-bold text-teal-900 text-center mb-6">4 Days of Bliss</h2>
+                    
+                    <div class="space-y-5 overflow-y-auto pr-2 relative z-10">
+                        <div class="flex gap-4 group">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex-shrink-0 flex items-center justify-center text-xl shadow-sm border border-teal-200">🏛️</div>
+                            <div>
+                                <h4 class="text-[12px] font-bold text-teal-950 uppercase">Day 1: History</h4>
+                                <p class="text-[10px] text-gray-500">Cellular Jail Light & Sound Show.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 group">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex-shrink-0 flex items-center justify-center text-xl shadow-sm border border-teal-200">⛴️</div>
+                            <div>
+                                <h4 class="text-[12px] font-bold text-teal-950 uppercase">Day 2: Havelock</h4>
+                                <p class="text-[10px] text-gray-500">Radhanagar Beach sunset views.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 group">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex-shrink-0 flex items-center justify-center text-xl shadow-sm border border-teal-200">🤿</div>
+                            <div>
+                                <h4 class="text-[12px] font-bold text-teal-950 uppercase">Day 3: Deep Sea</h4>
+                                <p class="text-[10px] text-gray-500">Scuba diving at Elephant Beach.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 group">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-100 flex-shrink-0 flex items-center justify-center text-xl shadow-sm border border-teal-200">🛶</div>
+                            <div>
+                                <h4 class="text-[12px] font-bold text-teal-950 uppercase">Day 4: Nature</h4>
+                                <p class="text-[10px] text-gray-500">Mangroves & Limestone Caves.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto p-5 bg-teal-900 text-white rounded-2xl relative overflow-hidden shadow-lg">
+                        <div class="relative z-10">
+                            <p class="handwritten text-2xl text-teal-300">Did you know?</p>
+                            <p class="text-[10px] opacity-80 leading-tight">Andaman is home to the Sentinelese, one of the world's last uncontacted tribes.</p>
+                        </div>
+                        <div class="absolute -right-4 -bottom-4 text-white/5 text-8xl">🐢</div>
+                    </div>
+                </div>
+
+                <div class="fold-line"></div>
+
+                <!-- PANEL 4: FOOD & CULTURE (With Food BG) -->
+                <div class="panel bg-food">
+                    <div class="halftone"></div>
+                    <h2 class="text-3xl font-bold text-teal-950 mb-6">Local Flavors</h2>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6 relative z-10">
+                        <div class="postcard -rotate-3 p-1">
+                            <img src="https://images.unsplash.com/photo-1518005020250-eca82022d1c1?auto=format&fit=crop&q=80&w=300" alt="Food">
+                            <div class="postcard-caption text-[8px]">Seafood Feast</div>
+                        </div>
+                        <div class="postcard rotate-3 p-1">
+                            <img src="https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&q=80&w=300" alt="Market">
+                            <div class="postcard-caption text-[8px]">Tropical Fruits</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5 relative z-10">
+                        <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-teal-100 shadow-sm">
+                            <h4 class="text-[11px] font-bold text-teal-800 uppercase mb-3 tracking-tighter">Must Try Cuisine</h4>
+                            <ul class="text-[10px] grid grid-cols-2 gap-3 text-gray-700">
+                                <li class="flex items-center gap-1">🦐 Prawn Curry</li>
+                                <li class="flex items-center gap-1">🐟 Grilled Snapper</li>
+                                <li class="flex items-center gap-1">🥥 Coconut Rice</li>
+                                <li class="flex items-center gap-1">🍌 Banana Chips</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-teal-600/10 rounded-xl border-l-4 border-teal-500 italic">
+                            <p class="text-[10px] text-teal-900 font-medium">Experience vibrant folk dances and buy authentic shell jewelry in local markets.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto flex justify-around py-4 border-t border-gray-200/50">
+                        <span class="text-3xl sticker">🐚</span>
+                        <span class="text-3xl sticker">🥥</span>
+                        <span class="text-3xl sticker">⛵</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const brochure = document.getElementById('brochure');
+        const body = document.body;
+
+        // Toggle the flip state of the brochure
+        function toggleFlip() {
+            brochure.classList.toggle('is-flipped');
+            const currentAngle = brochure.classList.contains('is-flipped') ? 180 : 0;
+            brochure.style.setProperty('--flip-angle', `${currentAngle}deg`);
+        }
+
+        // Toggle Immersive CSS mode
+        function toggleImmersive() {
+            body.classList.toggle('immersive-mode');
+        }
+
+        // Allow clicking the brochure to flip it directly
+        brochure.addEventListener('click', (e) => {
+            // Prevent flip if clicking specific interactive child elements if needed
+            toggleFlip();
+        });
+
+        // Escape key to exit immersive mode
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && body.classList.contains('immersive-mode')) {
+                toggleImmersive();
+            }
+        });
+    </script>
+</body>
+</html>
